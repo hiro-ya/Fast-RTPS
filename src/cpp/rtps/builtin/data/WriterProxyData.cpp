@@ -634,7 +634,7 @@ bool WriterProxyData::readFromCDRMessage(
                     }
                     case fastdds::dds::PID_TYPE_OBJECTV1:
                     {
-                        if (!m_type_id.readFromCDRMessage(msg, plength))
+                        if (!m_type.readFromCDRMessage(msg, plength))
                         {
                             return false;
                         }
