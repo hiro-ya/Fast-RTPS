@@ -25,11 +25,33 @@
 using namespace eprosima::fastrtps;
 using namespace eprosima::fastrtps::rtps;
 
+class LivelinessQos : public testing::Test
+{
+protected:
+
+
+    template<typename WriterType, typename ReaderType>
+    void config_pdp(
+            WriterType& writer,
+            ReaderType& reader)
+    {
+        constexpr unsigned int participant_announcement_period_ms = 50000;
+
+        writer.lease_duration(
+            participant_announcement_period_ms * 3e-3, participant_announcement_period_ms * 1e-3);
+        reader.lease_duration(
+            participant_announcement_period_ms * 3e-3, participant_announcement_period_ms * 1e-3);
+    }
+
+};
+
 //! Tests that when kind is automatic liveliness is never lost, even if the writer never sends data
-TEST(LivelinessQos, Liveliness_Automatic_Reliable)
+TEST_F(LivelinessQos, Liveliness_Automatic_Reliable)
 {
     PubSubReader<HelloWorldType> reader(TEST_TOPIC_NAME);
     PubSubWriter<HelloWorldType> writer(TEST_TOPIC_NAME);
+
+    config_pdp(writer, reader);
 
     // Liveliness lease duration and announcement period
     unsigned int lease_duration_ms = 1000;
@@ -62,10 +84,12 @@ TEST(LivelinessQos, Liveliness_Automatic_Reliable)
 }
 
 //! Same as above using best-effort reliability
-TEST(LivelinessQos, Liveliness_Automatic_BestEffort)
+TEST_F(LivelinessQos, Liveliness_Automatic_BestEffort)
 {
     PubSubReader<HelloWorldType> reader(TEST_TOPIC_NAME);
     PubSubWriter<HelloWorldType> writer(TEST_TOPIC_NAME);
+
+    config_pdp(writer, reader);
 
     // Liveliness lease duration and announcement period
     unsigned int lease_duration_ms = 1000;
@@ -100,10 +124,12 @@ TEST(LivelinessQos, Liveliness_Automatic_BestEffort)
 //! Tests that liveliness is lost and recovered as expected, with the following paramters
 //! Writer is reliable, and MANUAL_BY_PARTICIPANT
 //! Reader is reliable, and MANUAL_BY_PARTICIPANT
-TEST(LivelinessQos, ShortLiveliness_ManualByParticipant_Reliable)
+TEST_F(LivelinessQos, ShortLiveliness_ManualByParticipant_Reliable)
 {
     PubSubReader<HelloWorldType> reader(TEST_TOPIC_NAME);
     PubSubWriter<HelloWorldType> writer(TEST_TOPIC_NAME);
+
+    config_pdp(writer, reader);
 
     // Number of samples to write
     unsigned int num_samples = 2;
@@ -162,10 +188,12 @@ TEST(LivelinessQos, ShortLiveliness_ManualByParticipant_Reliable)
 //! Tests that liveliness is lost and recovered as expected, with the following paramters
 //! Writer is best-effort, and MANUAL_BY_PARTICIPANT
 //! Reader is best-effort, and MANUAL_BY_PARTICIPANT
-TEST(LivelinessQos, ShortLiveliness_ManualByParticipant_BestEffort)
+TEST_F(LivelinessQos, ShortLiveliness_ManualByParticipant_BestEffort)
 {
     PubSubReader<HelloWorldType> reader(TEST_TOPIC_NAME);
     PubSubWriter<HelloWorldType> writer(TEST_TOPIC_NAME);
+
+    config_pdp(writer, reader);
 
     // Number of samples to write
     unsigned int num_samples = 2;
@@ -224,10 +252,12 @@ TEST(LivelinessQos, ShortLiveliness_ManualByParticipant_BestEffort)
 //! Tests that liveliness is not lost when lease duration is big, with the following paramters
 //! Writer is best-effort, and MANUAL_BY_PARTICIPANT
 //! Reader is best-effort, and MANUAL_BY_PARTICIPANT
-TEST(LivelinessQos, LongLiveliness_ManualByParticipant_Reliable)
+TEST_F(LivelinessQos, LongLiveliness_ManualByParticipant_Reliable)
 {
     PubSubReader<HelloWorldType> reader(TEST_TOPIC_NAME);
     PubSubWriter<HelloWorldType> writer(TEST_TOPIC_NAME);
+
+    config_pdp(writer, reader);
 
     // Number of samples to write
     unsigned int num_samples = 2;
@@ -281,10 +311,12 @@ TEST(LivelinessQos, LongLiveliness_ManualByParticipant_Reliable)
 //! Tests that liveliness is not lost when lease duration is big, with the following paramters
 //! Writer is best-effort, and MANUAL_BY_PARTICIPANT
 //! Reader is best-effort, and MANUAL_BY_PARTICIPANT
-TEST(LivelinessQos, LongLiveliness_ManualByParticipant_BestEffort)
+TEST_F(LivelinessQos, LongLiveliness_ManualByParticipant_BestEffort)
 {
     PubSubReader<HelloWorldType> reader(TEST_TOPIC_NAME);
     PubSubWriter<HelloWorldType> writer(TEST_TOPIC_NAME);
+
+    config_pdp(writer, reader);
 
     // Number of samples to write
     unsigned int num_samples = 2;
@@ -338,10 +370,12 @@ TEST(LivelinessQos, LongLiveliness_ManualByParticipant_BestEffort)
 //! Tests that liveliness is lost and recovered as expected, with the following paramters
 //! Writer is reliable, and MANUAL_BY_TOPIC
 //! Reader is reliable, and MANUAL_BY_TOPIC
-TEST(LivelinessQos, ShortLiveliness_ManualByTopic_Reliable)
+TEST_F(LivelinessQos, ShortLiveliness_ManualByTopic_Reliable)
 {
     PubSubReader<HelloWorldType> reader(TEST_TOPIC_NAME);
     PubSubWriter<HelloWorldType> writer(TEST_TOPIC_NAME);
+
+    config_pdp(writer, reader);
 
     // Number of samples to write
     unsigned int num_samples = 2;
@@ -398,10 +432,12 @@ TEST(LivelinessQos, ShortLiveliness_ManualByTopic_Reliable)
 //! Tests that liveliness is lost and recovered, with the following paramters
 //! Writer is best-effort, and MANUAL_BY_TOPIC
 //! Reader is best-effort, and MANUAL_BY_TOPIC
-TEST(LivelinessQos, ShortLiveliness_ManualByTopic_BestEffort)
+TEST_F(LivelinessQos, ShortLiveliness_ManualByTopic_BestEffort)
 {
     PubSubReader<HelloWorldType> reader(TEST_TOPIC_NAME);
     PubSubWriter<HelloWorldType> writer(TEST_TOPIC_NAME);
+
+    config_pdp(writer, reader);
 
     // Number of samples to write
     unsigned int num_samples = 2;
@@ -458,10 +494,12 @@ TEST(LivelinessQos, ShortLiveliness_ManualByTopic_BestEffort)
 //! Tests liveliness is not lost when lease duration is big, with the following paramters
 //! Writer is reliable, and MANUAL_BY_TOPIC
 //! Reader is reliable, and MANUAL_BY_TOPIC
-TEST(LivelinessQos, LongLiveliness_ManualByTopic_Reliable)
+TEST_F(LivelinessQos, LongLiveliness_ManualByTopic_Reliable)
 {
     PubSubReader<HelloWorldType> reader(TEST_TOPIC_NAME);
     PubSubWriter<HelloWorldType> writer(TEST_TOPIC_NAME);
+
+    config_pdp(writer, reader);
 
     // Number of samples to write
     unsigned int num_samples = 2;
@@ -515,10 +553,12 @@ TEST(LivelinessQos, LongLiveliness_ManualByTopic_Reliable)
 //! Tests liveliness is not lost when lease duration is big, with the following paramters
 //! Writer is best-effort, and MANUAL_BY_TOPIC
 //! Reader is best-effort, and MANUAL_BY_TOPIC
-TEST(LivelinessQos, LongLiveliness_ManualByTopic_BestEffort)
+TEST_F(LivelinessQos, LongLiveliness_ManualByTopic_BestEffort)
 {
     PubSubReader<HelloWorldType> reader(TEST_TOPIC_NAME);
     PubSubWriter<HelloWorldType> writer(TEST_TOPIC_NAME);
+
+    config_pdp(writer, reader);
 
     // Number of samples to write
     unsigned int num_samples = 2;
@@ -572,10 +612,12 @@ TEST(LivelinessQos, LongLiveliness_ManualByTopic_BestEffort)
 //! Tests liveliness is not lost when lease duration is big, with the following parameters
 //! Writer is reliable, liveliness is manual by participant
 //! Reader is reliable, liveliness is automatic
-TEST(LivelinessQos, LongLiveliness_ManualByParticipant_Automatic_Reliable)
+TEST_F(LivelinessQos, LongLiveliness_ManualByParticipant_Automatic_Reliable)
 {
     PubSubReader<HelloWorldType> reader(TEST_TOPIC_NAME);
     PubSubWriter<HelloWorldType> writer(TEST_TOPIC_NAME);
+
+    config_pdp(writer, reader);
 
     // Write rate in milliseconds and number of samples to write
     unsigned int num_samples = 2;
@@ -628,10 +670,12 @@ TEST(LivelinessQos, LongLiveliness_ManualByParticipant_Automatic_Reliable)
 //! Tests liveliness is lost and recovered as expected, with the following parameters
 //! Writer is reliable, liveliness is manual by participant
 //! Reader is reliable, liveliness is automatic
-TEST(LivelinessQos, ShortLiveliness_ManualByParticipant_Automatic_Reliable)
+TEST_F(LivelinessQos, ShortLiveliness_ManualByParticipant_Automatic_Reliable)
 {
     PubSubReader<HelloWorldType> reader(TEST_TOPIC_NAME);
     PubSubWriter<HelloWorldType> writer(TEST_TOPIC_NAME);
+
+    config_pdp(writer, reader);
 
     // Number of samples to write
     unsigned int num_samples = 2;
@@ -688,10 +732,12 @@ TEST(LivelinessQos, ShortLiveliness_ManualByParticipant_Automatic_Reliable)
 //! Tests liveliness is not lost when lease duration is big, with the following parameters
 //! Writer is best-effort, liveliness is manual by participant
 //! Reader is best-effort, liveliness is automatic
-TEST(LivelinessQos, LongLiveliness_ManualByParticipant_Automatic_BestEffort)
+TEST_F(LivelinessQos, LongLiveliness_ManualByParticipant_Automatic_BestEffort)
 {
     PubSubReader<HelloWorldType> reader(TEST_TOPIC_NAME);
     PubSubWriter<HelloWorldType> writer(TEST_TOPIC_NAME);
+
+    config_pdp(writer, reader);
 
     // Number of samples to write
     unsigned int num_samples = 2;
@@ -745,10 +791,12 @@ TEST(LivelinessQos, LongLiveliness_ManualByParticipant_Automatic_BestEffort)
 //! Writer is best-effort, liveliness is manual by participant
 //! Reader is best-effort, liveliness is automatic
 //! Liveliness is short in comparison to the writer write/assert rate
-TEST(LivelinessQos, ShortLiveliness_ManualByParticipant_Automatic_BestEffort)
+TEST_F(LivelinessQos, ShortLiveliness_ManualByParticipant_Automatic_BestEffort)
 {
     PubSubReader<HelloWorldType> reader(TEST_TOPIC_NAME);
     PubSubWriter<HelloWorldType> writer(TEST_TOPIC_NAME);
+
+    config_pdp(writer, reader);
 
     // Number of samples to write
     unsigned int num_samples = 2;
@@ -805,10 +853,12 @@ TEST(LivelinessQos, ShortLiveliness_ManualByParticipant_Automatic_BestEffort)
 //! Tests liveliness is lost and recovered, with the following parameters
 //! Writer is reliable, and uses manual by topic liveliness kind
 //! Reader is reliable, and uses automatic liveliness kind
-TEST(LivelinessQos, ShortLiveliness_ManualByTopic_Automatic_Reliable)
+TEST_F(LivelinessQos, ShortLiveliness_ManualByTopic_Automatic_Reliable)
 {
     PubSubReader<HelloWorldType> reader(TEST_TOPIC_NAME);
     PubSubWriter<HelloWorldType> writer(TEST_TOPIC_NAME);
+
+    config_pdp(writer, reader);
 
     // Number of samples to write
     unsigned int num_samples = 2;
@@ -864,10 +914,12 @@ TEST(LivelinessQos, ShortLiveliness_ManualByTopic_Automatic_Reliable)
 //! Tests liveliness is lost and recovered, with the following parameters
 //! Writer is best-effort, and uses manual by topic liveliness kind
 //! Reader is best-effort, and uses automatic liveliness kind
-TEST(LivelinessQos, ShortLiveliness_ManualByTopic_Automatic_BestEffort)
+TEST_F(LivelinessQos, ShortLiveliness_ManualByTopic_Automatic_BestEffort)
 {
     PubSubReader<HelloWorldType> reader(TEST_TOPIC_NAME);
     PubSubWriter<HelloWorldType> writer(TEST_TOPIC_NAME);
+
+    config_pdp(writer, reader);
 
     // Number of times to assert liveliness
     unsigned int num_samples = 2;
@@ -923,10 +975,12 @@ TEST(LivelinessQos, ShortLiveliness_ManualByTopic_Automatic_BestEffort)
 //! Tests liveliness is lost and recovered as expected, with the following parameters
 //! Writer is reliable, and uses manual by topic liveliness kind
 //! Reader is reliable, and uses manual by participant liveliness kind
-TEST(LivelinessQos, ShortLiveliness_ManualByTopic_ManualByParticipant_Reliable)
+TEST_F(LivelinessQos, ShortLiveliness_ManualByTopic_ManualByParticipant_Reliable)
 {
     PubSubReader<HelloWorldType> reader(TEST_TOPIC_NAME);
     PubSubWriter<HelloWorldType> writer(TEST_TOPIC_NAME);
+
+    config_pdp(writer, reader);
 
     // Number of samples to write
     unsigned int num_samples = 2;
@@ -982,10 +1036,12 @@ TEST(LivelinessQos, ShortLiveliness_ManualByTopic_ManualByParticipant_Reliable)
 //! Tests liveliness is lost and recovered as expected, with the following parameters
 //! Writer is best-effort, and uses manual by topic liveliness kind
 //! Reader is best-effort, and uses manual by participant liveliness kind
-TEST(LivelinessQos, ShortLiveliness_ManualByTopic_ManualByParticipant_BestEffort)
+TEST_F(LivelinessQos, ShortLiveliness_ManualByTopic_ManualByParticipant_BestEffort)
 {
     PubSubReader<HelloWorldType> reader(TEST_TOPIC_NAME);
     PubSubWriter<HelloWorldType> writer(TEST_TOPIC_NAME);
+
+    config_pdp(writer, reader);
 
     // Write rate in milliseconds and number of samples to write
     unsigned int num_samples = 2;
@@ -1028,7 +1084,7 @@ TEST(LivelinessQos, ShortLiveliness_ManualByTopic_ManualByParticipant_BestEffort
     for (count = 0; count < num_samples; count++)
     {
         writer.assert_liveliness();
-        std::this_thread::sleep_for(std::chrono::milliseconds(lease_duration_ms * 2));
+        writer.wait_liveliness_lost(num_samples + count + 1);
     }
 
     EXPECT_EQ(writer.times_liveliness_lost(), num_samples * 2);
@@ -1042,7 +1098,7 @@ TEST(LivelinessQos, ShortLiveliness_ManualByTopic_ManualByParticipant_BestEffort
 //! Tests liveliness in the following scenario
 //! A participant with two publishers (AUTOMATIC and MANUAL_BY_PARTICIPANT) and a single topic
 //! A participant with one subscriber (AUTOMATIC)
-TEST(LivelinessQos, TwoWriters_OneReader_ManualByParticipant)
+TEST_F(LivelinessQos, TwoWriters_OneReader_ManualByParticipant)
 {
     unsigned int num_pub = 2;
     unsigned int num_sub = 1;
@@ -1090,7 +1146,7 @@ TEST(LivelinessQos, TwoWriters_OneReader_ManualByParticipant)
 //! A participant with two subscribers and two topics
 //! Manual by participant liveliness
 //! Only one publisher asserts liveliness manually
-TEST(LivelinessQos, TwoWriters_TwoReaders_ManualByParticipant)
+TEST_F(LivelinessQos, TwoWriters_TwoReaders_ManualByParticipant)
 {
     unsigned int num_pub = 2;
     unsigned int num_sub = 2;
@@ -1146,7 +1202,7 @@ TEST(LivelinessQos, TwoWriters_TwoReaders_ManualByParticipant)
 //! A participant with two subscribers and two topics
 //! Manual by topic liveliness
 //! Only one publisher asserts liveliness manually
-TEST(LivelinessQos, TwoWriters_TwoReaders_ManualByTopic)
+TEST_F(LivelinessQos, TwoWriters_TwoReaders_ManualByTopic)
 {
     unsigned int num_pub = 2;
     unsigned int num_sub = 2;
@@ -1207,7 +1263,7 @@ TEST(LivelinessQos, TwoWriters_TwoReaders_ManualByTopic)
 //! Tests liveliness in the following scenario
 //! A participant with two publishers with different liveliness kinds
 //! A participant with two subscribers with different liveliness kinds
-TEST(LivelinessQos, TwoWriters_TwoReaders)
+TEST_F(LivelinessQos, TwoWriters_TwoReaders)
 {
     unsigned int num_pub = 2;
     unsigned int num_sub = 2;
@@ -1261,7 +1317,7 @@ TEST(LivelinessQos, TwoWriters_TwoReaders)
 //! Tests liveliness in the same scenario as above but using manual by topic liveliness
 //! A participant with three publishers with different liveliness kinds
 //! A participant with three subscribers with different liveliness kinds
-TEST(LivelinessQos, ThreeWriters_ThreeReaders)
+TEST_F(LivelinessQos, ThreeWriters_ThreeReaders)
 {
     unsigned int num_pub = 3;
     unsigned int num_sub = 3;
@@ -1339,7 +1395,7 @@ TEST(LivelinessQos, ThreeWriters_ThreeReaders)
 }
 
 //! Tests the case where a writer matched to two readers changes QoS and stays matched to only one reader
-TEST(LivelinessQos, UnmatchedWriter)
+TEST_F(LivelinessQos, UnmatchedWriter)
 {
     unsigned int num_pub = 1;
     unsigned int num_sub = 2;
@@ -1384,10 +1440,12 @@ TEST(LivelinessQos, UnmatchedWriter)
 //! Tests liveliness structs when a writer changes from being alive to losing liveliness
 //! Writer is reliable, and MANUAL_BY_TOPIC
 //! Reader is reliable, and MANUAL_BY_TOPIC
-TEST(LivelinessQos, LivelinessChangedStatus_Alive_NotAlive)
+TEST_F(LivelinessQos, LivelinessChangedStatus_Alive_NotAlive)
 {
     PubSubReader<HelloWorldType> reader(TEST_TOPIC_NAME);
     PubSubWriter<HelloWorldType> writer(TEST_TOPIC_NAME);
+
+    config_pdp(writer, reader);
 
     // Liveliness lease duration and announcement period, in milliseconds
     unsigned int lease_duration_ms = 100;
@@ -1439,10 +1497,12 @@ TEST(LivelinessQos, LivelinessChangedStatus_Alive_NotAlive)
 //! Tests liveliness structs when an alive writer is unmatched
 //! Writer is reliable, and MANUAL_BY_TOPIC
 //! Reader is reliable, and MANUAL_BY_TOPIC
-TEST(LivelinessQos, LivelinessChangedStatus_Alive_Unmatched)
+TEST_F(LivelinessQos, LivelinessChangedStatus_Alive_Unmatched)
 {
     PubSubReader<HelloWorldType> reader(TEST_TOPIC_NAME);
     PubSubWriter<HelloWorldType> writer(TEST_TOPIC_NAME);
+
+    config_pdp(writer, reader);
 
     // Liveliness lease duration and announcement period, in milliseconds
     unsigned int lease_duration_ms = 100;
@@ -1490,10 +1550,12 @@ TEST(LivelinessQos, LivelinessChangedStatus_Alive_Unmatched)
 //! Tests liveliness structs when a not alive writer is unmatched
 //! Writer is reliable, and MANUAL_BY_TOPIC
 //! Reader is reliable, and MANUAL_BY_TOPIC
-TEST(LivelinessQos, LivelinessChangedStatus_NotAlive_Unmatched)
+TEST_F(LivelinessQos, LivelinessChangedStatus_NotAlive_Unmatched)
 {
     PubSubReader<HelloWorldType> reader(TEST_TOPIC_NAME);
     PubSubWriter<HelloWorldType> writer(TEST_TOPIC_NAME);
+
+    config_pdp(writer, reader);
 
     // Liveliness lease duration and announcement period, in milliseconds
     unsigned int lease_duration_ms = 100;
@@ -1544,7 +1606,7 @@ TEST(LivelinessQos, LivelinessChangedStatus_NotAlive_Unmatched)
 
 //! Tests the assert_liveliness on the participant
 //! A participant with three publishers, two MANUAL_BY_PARTICIPANT liveliness, one MANUAL_BY_TOPIC
-TEST(LivelinessQos, AssertLivelinessParticipant)
+TEST_F(LivelinessQos, AssertLivelinessParticipant)
 {
     unsigned int num_pub = 3;
     unsigned int lease_duration_ms = 100;
